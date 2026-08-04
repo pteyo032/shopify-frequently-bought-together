@@ -1,0 +1,43 @@
+{
+  "names": {
+    "frequently_bought_together": "Souvent achetés ensemble"
+  },
+  "categories": {
+    "product": "Produit"
+  },
+  "settings": {
+    "heading": "Titre",
+    "frequently_bought_together_subheading": "Sous-titre",
+    "complementary_products": "Produits complémentaires (optionnel)",
+    "frequently_bought_together_button_text": "Texte du bouton \"Ajouter au panier\"",
+    "width": "Largeur",
+    "background_color": "Couleur d'arrière-plan",
+    "default": "Par défaut",
+    "style": "Style",
+    "thickness": "Épaisseur",
+    "opacity": "Opacité",
+    "color": "Couleur",
+    "border_radius": "Rayon de la bordure",
+    "top": "Haut",
+    "bottom": "Bas",
+    "product": "Produit",
+    "enable_frequently_bought_together": "Activer"
+  },
+  "options": {
+    "page": "Page",
+    "full": "Pleine",
+    "none": "Aucun",
+    "solid": "Plein"
+  },
+  "info": {
+    "complementary_products": "Choisissez jusqu'à 3 produits manuellement. Laissez vide pour utiliser les recommandations automatiques de produits complémentaires de Shopify.",
+    "frequently_bought_together_button_text": "Laissez vide pour utiliser le libellé par défaut \"Ajouter au panier\".",
+    "frequently_bought_together_product": "Le produit auquel se rapporte ce widget. Utilise le produit courant par défaut si ajouté sur une fiche produit — requis si ajouté ailleurs (ex. une page personnalisée).",
+    "enable_frequently_bought_together": "Désactivez pour masquer temporairement ce bloc sans perdre votre configuration."
+  },
+  "content": {
+    "borders": "Bordures",
+    "padding": "Espacement",
+    "section_layout": "Mise en page de la section"
+  }
+}

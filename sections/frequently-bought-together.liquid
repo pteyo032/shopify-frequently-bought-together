@@ -1,0 +1,531 @@
+{% liquid
+  assign fbt_product = section.settings.product
+  if fbt_product == blank
+    assign fbt_product = product
+  endif
+  if request.visual_preview_mode and fbt_product == blank
+    assign fbt_product = collections.all.products.first
+  endif
+
+  assign show_section = false
+  if fbt_product != blank and section.settings.enabled
+    assign show_section = true
+  endif
+
+  assign manual_products = section.settings.complementary_products
+  assign has_manual_override = false
+  if manual_products.size > 0
+    assign has_manual_override = true
+  endif
+
+  assign visible_manual_count = 0
+  assign initial_total = fbt_product.selected_or_first_available_variant.price
+  if has_manual_override
+    for comp_product in manual_products limit: 3
+      unless comp_product.available
+        continue
+      endunless
+      assign visible_manual_count = visible_manual_count | plus: 1
+      assign initial_total = initial_total | plus: comp_product.selected_or_first_available_variant.price
+    endfor
+  endif
+
+  assign show_skeleton = false
+  if has_manual_override == false
+    assign show_skeleton = true
+  endif
+
+  assign initially_hidden = false
+  if has_manual_override and visible_manual_count == 0
+    assign initially_hidden = true
+  endif
+
+  if section.settings.background_color != blank
+    render 'contrast-override', background_color: section.settings.background_color, section_id: section.id
+  endif
+%}
+
+<div class="section-background{% if section.settings.background_color != blank %} color-custom-{{ section.id }}{% endif %}"></div>
+<div
+  class="
+    section
+    section--{{ section.settings.section_width }}
+    {% if section.settings.background_color != blank %}color-custom-{{ section.id }}{% endif %}
+    spacing-style
+  "
+  style="{% render 'spacing-style', settings: section.settings %}"
+>
+  {% if show_section %}
+    <frequently-bought-together-component
+      class="frequently-bought-together{% if show_skeleton %} frequently-bought-together--loading{% endif %}"
+      data-product-id="{{ fbt_product.id }}"
+      data-manual-override="{{ has_manual_override }}"
+      data-recommendations-url="{{ routes.product_recommendations_url }}"
+      data-currency="{{ cart.currency.iso_code }}"
+      data-sold-out-text="{{ 'products.product.sold_out' | t }}"
+      data-unavailable-text="{{ 'products.product.unavailable' | t }}"
+      data-error-text="{{ 'products.product.add_to_cart_error' | t }}"
+      data-added-text="{{ 'actions.added' | t }}"
+      {% if initially_hidden %}
+        hidden
+      {% endif %}
+      {% if request.visual_preview_mode %}
+        data-shopify-visual-preview
+      {% endif %}
+    >
+      <div
+        class="visually-hidden"
+        aria-live="assertive"
+        role="status"
+        aria-atomic="true"
+        ref="liveRegion"
+      ></div>
+      <div
+        class="frequently-bought-together__error hidden"
+        ref="errorMessage"
+        role="alert"
+      ></div>
+
+      <template ref="moneyFormat">{{ shop.money_format }}</template>
+
+      {%- if section.settings.heading != blank or section.settings.subheading != blank -%}
+        <div class="frequently-bought-together__header">
+          {%- if section.settings.heading != blank -%}
+            <h3 class="frequently-bought-together__heading">{{ section.settings.heading }}</h3>
+          {%- endif -%}
+          {%- if section.settings.subheading != blank -%}
+            <p class="frequently-bought-together__subheading">{{ section.settings.subheading }}</p>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <div
+        class="frequently-bought-together__card border-style{% if section.settings.border_radius > 0 %} has-border-radius{% endif %}"
+        style="{% render 'border-override', settings: section.settings %}"
+      >
+        <div class="frequently-bought-together__rows" ref="rowList">
+          {%- comment -%}
+            Main product thumbnail — always present. Its price/variant data (not shown as
+            text, just held as data attributes) is kept in sync with the page's standard
+            variant picker via StandardEvents.productSelect in JS, and with Bundle
+            Selector's selected tier via ThemeEvents.bundleTierChange.
+          {%- endcomment -%}
+          <div
+            class="frequently-bought-together__row frequently-bought-together__row--main"
+            ref="mainProductPrice"
+            data-price="{{ fbt_product.selected_or_first_available_variant.price }}"
+            data-variant-id="{{ fbt_product.selected_or_first_available_variant.id }}"
+          >
+            <span class="frequently-bought-together__thumbnail">
+              {%- if fbt_product.featured_image != blank -%}
+                {{
+                  fbt_product.featured_image
+                  | image_url: width: 200
+                  | image_tag:
+                    width: 64,
+                    height: 64,
+                    loading: 'lazy',
+                    alt: fbt_product.title,
+                    class: 'frequently-bought-together__thumbnail-image'
+                }}
+              {%- endif -%}
+            </span>
+          </div>
+
+          {%- if has_manual_override -%}
+            {%- for comp_product in manual_products limit: 3 -%}
+              {%- unless comp_product.available -%}
+                {%- continue -%}
+              {%- endunless -%}
+              {%- liquid
+                assign comp_variant = comp_product.selected_or_first_available_variant
+              -%}
+              <span class="frequently-bought-together__plus" aria-hidden="true">+</span>
+              <div
+                class="frequently-bought-together__row"
+                ref="complementaryRows"
+                data-price="{{ comp_variant.price }}"
+                data-variant-id="{{ comp_variant.id }}"
+              >
+                <span class="frequently-bought-together__thumbnail">
+                  {%- if comp_product.featured_image != blank -%}
+                    {{
+                      comp_product.featured_image
+                      | image_url: width: 200
+                      | image_tag:
+                        width: 64,
+                        height: 64,
+                        loading: 'lazy',
+                        alt: comp_product.title,
+                        class: 'frequently-bought-together__thumbnail-image'
+                    }}
+                  {%- endif -%}
+                </span>
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+
+          {%- if show_skeleton -%}
+            <div class="frequently-bought-together__skeleton" ref="skeleton" aria-hidden="true">
+              <span class="frequently-bought-together__plus">+</span>
+              <span class="frequently-bought-together__skeleton-thumbnail"></span>
+              <span class="frequently-bought-together__plus">+</span>
+              <span class="frequently-bought-together__skeleton-thumbnail"></span>
+            </div>
+          {%- endif -%}
+        </div>
+
+        <div class="frequently-bought-together__summary">
+          <span class="frequently-bought-together__total-label">
+            {{- 'blocks.frequently_bought_together.total_label' | t -}}
+          </span>
+          <span class="frequently-bought-together__total-price" ref="totalPrice">
+            {{- initial_total | money -}}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          class="button frequently-bought-together__add-to-cart"
+          ref="addToCartButton"
+          on:click="/addToCart"
+          {% unless fbt_product.available %}
+            disabled
+          {% endunless %}
+        >
+          <span ref="addToCartButtonText">
+            {%- if fbt_product.available -%}
+              {%- if section.settings.add_to_cart_button_text != blank -%}
+                {{ section.settings.add_to_cart_button_text }}
+              {%- else -%}
+                {{ 'products.product.add_to_cart' | t }}
+              {%- endif -%}
+            {%- else -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- endif -%}
+          </span>
+        </button>
+      </div>
+
+      <script type="application/json" ref="variantsData">
+        {{ fbt_product.variants | json }}
+      </script>
+    </frequently-bought-together-component>
+
+    <script
+      src="{{ 'frequently-bought-together.js' | asset_url }}"
+      type="module"
+    ></script>
+  {% elsif request.design_mode %}
+    <div class="frequently-bought-together__empty-state">
+      {{- 'content.frequently_bought_together_empty_state' | t -}}
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .frequently-bought-together {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 40rem;
+  }
+
+  .frequently-bought-together__card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .frequently-bought-together[hidden] {
+    display: none;
+  }
+
+  .frequently-bought-together__empty-state {
+    opacity: var(--opacity-subdued-text, 0.7);
+  }
+
+  .frequently-bought-together__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .frequently-bought-together__heading {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .frequently-bought-together__subheading {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--color-foreground);
+    opacity: var(--opacity-subdued-text, 0.7);
+  }
+
+  .frequently-bought-together__rows {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .frequently-bought-together__row {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .frequently-bought-together__plus {
+    flex-shrink: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+    opacity: var(--opacity-subdued-text, 0.7);
+  }
+
+  .frequently-bought-together__thumbnail {
+    flex-shrink: 0;
+    display: block;
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .frequently-bought-together__thumbnail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.25rem;
+  }
+
+  .frequently-bought-together__skeleton {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .frequently-bought-together--loading .frequently-bought-together__skeleton {
+    display: flex;
+  }
+
+  .frequently-bought-together__skeleton-thumbnail {
+    display: block;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--color-foreground) 8%, transparent);
+    animation: frequently-bought-together-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes frequently-bought-together-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+
+  .frequently-bought-together__summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+
+  .frequently-bought-together__total-price {
+    font-size: 1.125rem;
+  }
+
+  .frequently-bought-together__add-to-cart {
+    width: 100%;
+  }
+
+  .frequently-bought-together__error {
+    color: var(--color-error, #d02e2e);
+  }
+
+  .frequently-bought-together__error.hidden {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .frequently-bought-together__thumbnail,
+    .frequently-bought-together__skeleton-thumbnail {
+      width: 3.5rem;
+      height: 3.5rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.frequently_bought_together",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:settings.product",
+      "info": "t:info.frequently_bought_together_product"
+    },
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "t:settings.enable_frequently_bought_together",
+      "info": "t:info.enable_frequently_bought_together",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.heading",
+      "default": "Frequently bought together"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:settings.frequently_bought_together_subheading",
+      "default": "Based on products customers bought together"
+    },
+    {
+      "type": "product_list",
+      "id": "complementary_products",
+      "label": "t:settings.complementary_products",
+      "info": "t:info.complementary_products",
+      "limit": 3
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_button_text",
+      "label": "t:settings.frequently_bought_together_button_text",
+      "info": "t:info.frequently_bought_together_button_text",
+      "placeholder": "t:settings.default"
+    },
+    {
+      "type": "header",
+      "content": "t:content.section_layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:settings.background_color",
+      "placeholder": "t:settings.default"
+    },
+    {
+      "type": "header",
+      "content": "t:content.borders"
+    },
+    {
+      "type": "select",
+      "id": "border",
+      "label": "t:settings.style",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "solid",
+          "label": "t:options.solid"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "t:settings.thickness",
+      "default": 1,
+      "visible_if": "{{ section.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:settings.opacity",
+      "default": 100,
+      "visible_if": "{{ section.settings.border != 'none' }}"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "t:settings.color",
+      "placeholder": "t:settings.default",
+      "visible_if": "{{ section.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "t:settings.border_radius",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.frequently_bought_together",
+      "category": "t:categories.product",
+      "settings": {
+        "product": "{{ closest.product }}"
+      }
+    }
+  ]
+}
+{% endschema %}

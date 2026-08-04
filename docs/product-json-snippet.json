@@ -1,0 +1,19 @@
+{
+  "frequently_bought_together_1": {
+    "type": "frequently-bought-together",
+    "settings": {
+      "product": "{{ closest.product }}",
+      "enabled": true,
+      "heading": "Frequently bought together",
+      "subheading": "Based on products customers bought together",
+      "complementary_products": [],
+      "section_width": "page-width",
+      "border": "solid",
+      "border_width": 1,
+      "border_opacity": 100,
+      "border_radius": 12,
+      "padding-block-start": 36,
+      "padding-block-end": 36
+    }
+  }
+}

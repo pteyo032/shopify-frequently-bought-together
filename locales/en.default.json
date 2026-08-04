@@ -1,0 +1,21 @@
+{
+  "actions": {
+    "added": "Added"
+  },
+  "blocks": {
+    "frequently_bought_together": {
+      "total_label": "Total for selected items:"
+    }
+  },
+  "content": {
+    "frequently_bought_together_empty_state": "Frequently bought together: choose a product above to preview this section."
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to cart",
+      "add_to_cart_error": "Error adding to cart",
+      "sold_out": "Sold out",
+      "unavailable": "Unavailable"
+    }
+  }
+}

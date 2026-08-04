@@ -1,0 +1,43 @@
+{
+  "names": {
+    "frequently_bought_together": "Often bought together"
+  },
+  "categories": {
+    "product": "Product"
+  },
+  "settings": {
+    "heading": "Heading",
+    "frequently_bought_together_subheading": "Subheading",
+    "complementary_products": "Complementary products (optional)",
+    "frequently_bought_together_button_text": "\"Add to cart\" button text",
+    "width": "Width",
+    "background_color": "Background color",
+    "default": "Default",
+    "style": "Style",
+    "thickness": "Thickness",
+    "opacity": "Opacity",
+    "color": "Color",
+    "border_radius": "Corner radius",
+    "top": "Top",
+    "bottom": "Bottom",
+    "product": "Product",
+    "enable_frequently_bought_together": "Enable"
+  },
+  "options": {
+    "page": "Page",
+    "full": "Full",
+    "none": "None",
+    "solid": "Solid"
+  },
+  "info": {
+    "complementary_products": "Choose up to 3 products manually. Leave empty to use Shopify's automatic complementary product recommendations.",
+    "frequently_bought_together_button_text": "Leave blank to use the default \"Add to cart\" label.",
+    "frequently_bought_together_product": "Which product this widget is about. Defaults to the current product when added on a product page — required when added elsewhere (e.g. a custom page).",
+    "enable_frequently_bought_together": "Turn off to temporarily hide this block without losing your configuration."
+  },
+  "content": {
+    "borders": "Borders",
+    "padding": "Padding",
+    "section_layout": "Section layout"
+  }
+}
