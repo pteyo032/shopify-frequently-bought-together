@@ -11,6 +11,8 @@ schéma popularisé par Amazon.
 Conçu pour le thème **Shopify Horizon**. Aucune application tierce, aucun
 abonnement mensuel.
 
+![La section rendue sur une vraie fiche produit : titre, sous-titre, vignettes reliées par des "+", un total en direct, et un bouton "Ajouter au panier", le tout dans un contour configurable](docs/screenshots/frequently-bought-together.png)
+
 ## Fonctionnalités
 
 - **Sourcé automatiquement ou manuellement.** Par défaut, les produits

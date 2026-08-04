@@ -10,6 +10,8 @@ famous.
 
 Built for the **Shopify Horizon** theme. No third-party app, no monthly fee.
 
+![The section rendered on a real product page: title, subtitle, thumbnails connected by "+", a live total, and an "Add to cart" button, all inside a configurable border](docs/screenshots/frequently-bought-together.png)
+
 ## Features
 
 - **Sourced automatically or manually.** By default, complementary products
