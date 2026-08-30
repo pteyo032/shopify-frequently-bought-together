@@ -2,6 +2,8 @@
 
 # Shopify Frequently Bought Together — Widget de vente croisée façon Amazon
 
+[![Theme Check](https://github.com/pteyo032/shopify-frequently-bought-together/actions/workflows/theme-check.yml/badge.svg)](https://github.com/pteyo032/shopify-frequently-bought-together/actions/workflows/theme-check.yml)
+
 Une section "Fréquemment achetés ensemble" intégrée au thème, pour les
 fiches produit Shopify : le produit principal plus jusqu'à 3 produits
 complémentaires, affichés en vignettes reliées par des "+", avec un total en
