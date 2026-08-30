@@ -2,6 +2,8 @@
 
 # Shopify Frequently Bought Together — Amazon-style cross-sell widget
 
+[![Theme Check](https://github.com/pteyo032/shopify-frequently-bought-together/actions/workflows/theme-check.yml/badge.svg)](https://github.com/pteyo032/shopify-frequently-bought-together/actions/workflows/theme-check.yml)
+
 A theme-native "Frequently bought together" section for Shopify product
 pages: the main product plus up to 3 complementary products, shown as
 thumbnails connected by "+" signs, with a live total and a single button

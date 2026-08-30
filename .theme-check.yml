@@ -1,0 +1,8 @@
+# This repo is a fragment of the Horizon theme (a single section), not a full
+# theme. MissingTemplate flags Horizon-native snippets (contrast-override,
+# border-override, spacing-style) that a real Horizon theme provides — this
+# repo intentionally doesn't ship copies of shared theme files.
+extends: theme-check:recommended
+
+MissingTemplate:
+  enabled: false
